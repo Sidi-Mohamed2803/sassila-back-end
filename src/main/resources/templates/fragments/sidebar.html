@@ -1,0 +1,28 @@
+<html xmlns:th="http://www.thymeleaf.org">
+
+<body>
+    <div th:fragment="SideBar">
+        <div class="bg-white" id="sidebar-wrapper">
+
+            <div class="sidebar-heading text-center py-4 primary-text fw-bold text-uppercase border-bottom">
+                <i class="fas fa-user-secret me-2"></i> Sassila
+            </div>
+
+            <div class="list-group list-group-flush my-3">
+                <a href="/admin" class="list-group-item list-group-item-action bg-transparent second-text">
+                    <i class="fas fa-tachometer-alt me-2"></i>Tableau de bord
+                </a>
+                <a href="/admin/individus" class="list-group-item list-group-item-action bg-transparent second-text">
+                    <i class="fas fa-tachometer-alt me-2"></i>Membres
+                </a>
+                <a href="/admin/nouvel-individu"
+                    class="list-group-item list-group-item-action bg-transparent second-text">
+                    <i class="fas fa-tachometer-alt me-2"></i>Nouvel individu
+                </a>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,26 @@
+<html xmlns:th="http://www.thymeleaf.org">
+
+<body>
+    <div th:fragment="Footer">
+        <script src="/js/bootstrap.min.js"></script>
+        <script>
+            var el = document.getElementById("wrapper");
+            var toggleButton = document.getElementById("menu-toggle");
+
+            toggleButton.onclick = function () {
+                el.classList.toggle("toggled")
+            }
+
+            function deleteIndividu(id) {
+                if (confirm('Voulez vous supprimer cet individu ?')) {
+                    $.ajax({
+                        type: 'DELETE',
+                        url: "supprimer-individu/"+id,
+                    },);
+                }
+            }
+        </script>
+    </div>
+</body>
+
+</html>

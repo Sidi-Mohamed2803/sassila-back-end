@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <div th:replace="fragments/head :: Head"></div>
+    <title>Sassila - Enfants</title>
+</head>
+
+<body>
+    <div class="d-flex" id="wrapper">
+
+        <!-- Sidebar starts here -->
+
+        <div th:insert="fragments/sidebar :: SideBar">
+
+        </div>
+
+        <!-- Sidebar ends here -->
+
+        <div id="page-content-wrapper">
+            <div th:insert="fragments/nav :: Nav(page='Enfants')"></div>
+
+            <div class="container-fluid px-4">
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <a th:href="@{/admin/{id}/ajouter-enfant(id=${individu.id})}" class="btn btn-primary"><i
+                            class="fas fa-plus"></i> Ajouter enfant</a>
+                </div>
+                <div class="row my-5">
+                    <h3>Individus enregistrés</h3>
+                    <div class="col">
+                        <table class="table bg-white rounded shadow-sm table-hover text-center">
+                            <thead>
+                                <tr>
+                                    <th scope="col" width="50">#</th>
+                                    <th scope="col">Prénom</th>
+                                    <th scope="col">Nom</th>
+                                    <th scope="col">Date de naissance</th>
+                                    <th scope="col">Résidence</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="enfant: ${enfants}">
+                                    <th scope="row" th:text="${enfant.id}"></th>
+                                    <td th:text="${enfant.prenom}"></td>
+                                    <td th:text="${enfant.nom}"></td>
+                                    <td th:text="${enfant.date_naissance}"></td>
+                                    <td th:text="${enfant.residence_actuelle}"></td>
+                                    <td>
+                                        <a th:href="@{/admin/editer-individu/{id}(id=${enfant.id})}">
+                                            <i class="fas fa-light fa-file-pen"></i>
+                                        </a>
+                                        &nbsp;
+                                        <a th:href="@{/admin/individu/{id}(id=${enfant.id})}">
+                                            <i class="fas fa-regular fa-eye"></i>
+                                        </a>
+                                        &nbsp;
+                                        <a href="#" data-bs-toggle="modal"
+                                            th:attr="data-bs-target='#deleteModal'+${enfant.id}">
+                                            <i class="fas fa-light fa-trash-can"></i>
+                                        </a>
+                                    </td>
+                                    <div class="modal fade" tabindex="-1" th:attr="id='deleteModal'+${enfant.id}">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Suppression</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p>Voulez-vous supprimer <span
+                                                            th:text="${enfant.prenom +' '+enfant.nom}"></span>
+                                                        ?
+                                                    </p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary"
+                                                        data-bs-dismiss="modal">Non</button>
+                                                    <a th:href="@{/admin/supprimer-individu/{id}(id=${enfant.id})}"
+                                                        class="btn btn-danger">Oui</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    <div th:insert="fragments/footer :: Footer"></div>
+</body>
+
+</html>

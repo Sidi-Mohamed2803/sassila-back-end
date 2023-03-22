@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <div th:replace="fragments/head :: Head"></div>
+    <title>Sassila - Tableau de bord</title>
+</head>
+
+<body>
+    <div class="d-flex" id="wrapper">
+
+        <!-- Sidebar starts here -->
+
+        <div th:insert="fragments/sidebar :: SideBar">
+        </div>
+
+        <!-- Sidebar ends here -->
+
+        <div id="page-content-wrapper">
+            <div th:insert="fragments/nav :: Nav(page='Tableau de bord')"></div>
+
+            <div class="container-fluid px-4">
+                <div class="row g-3 my-2">
+                    <div class="col-md-3">
+                        <div class="p-3 bg-white shadow-sm d-flex justify-content-around align-items-center rounded">
+                            <div>
+                                <h3 class="fs-2">
+                                    <span th:text="${nbreIndividus}"></span>
+                                </h3>
+                                <p class="fs-5">
+                                    Individus
+                                </p>
+                            </div>
+                            <i class="fas fa-people-group fs-1 primary-text border rounded-full secondary-bg p-3"></i>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="p-3 bg-white shadow-sm d-flex justify-content-around align-items-center rounded">
+                            <div>
+                                <h3 class="fs-2">
+                                    <span th:text="${nbreHommes}"></span>
+                                </h3>
+                                <p class="fs-5">
+                                    Hommes
+                                </p>
+                            </div>
+                            <i class="fas fa-person fs-1 primary-text border rounded-full secondary-bg p-3"></i>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="p-3 bg-white shadow-sm d-flex justify-content-around align-items-center rounded">
+                            <div>
+                                <h3 class="fs-2">
+                                    <span th:text="${nbreFemmes}"></span>
+                                </h3>
+                                <p class="fs-5">
+                                    Femmes
+                                </p>
+                            </div>
+                            <i class="fas fa-person-dress fs-1 primary-text border rounded-full secondary-bg p-3"></i>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row my-5">
+                    <h3>Individus récemment ajoutés</h3>
+                    <div class="col">
+                        <table class="table bg-white rounded shadow-sm table-hover text-center">
+                            <thead>
+                                <tr>
+                                    <th scope="col" width="50">#</th>
+                                    <th scope="col">Prénom</th>
+                                    <th scope="col">Nom</th>
+                                    <th scope="col">Date de naissance</th>
+                                    <th scope="col">Résidence</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="individu: ${individus}">
+                                    <th scope="row" th:text="${individu.value.id}"></th>
+                                    <td th:text="${individu.value.prenom}"></td>
+                                    <td th:text="${individu.value.nom}"></td>
+                                    <td th:text="${individu.value.date_naissance}"></td>
+                                    <td th:text="${individu.value.residence_actuelle}"></td>
+                                    <td>
+                                        <a th:href="@{/admin/editer-individu/{id}(id=${individu.value.id})}">
+                                            <i class="fas fa-light fa-file-pen"></i>
+                                        </a>
+                                        &nbsp;
+                                        <a th:href="@{/admin/individu/{id}(id=${individu.value.id})}">
+                                            <i class="fas fa-regular fa-eye"></i>
+                                        </a>
+                                        &nbsp;
+                                        <a th:href="@{/admin/supprimer-individu/{id}(id=${individu.value.id})}"
+                                            data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                            <i class="fas fa-light fa-trash-can"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="modal fade" tabindex="-1" id="deleteModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Suppression</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Voulez-vous supprimer l'individu selectionné ?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Non</button>
+                    <button type="button" class="btn btn-danger">Oui</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:insert="fragments/footer :: Footer"></div>
+</body>
+
+</html>

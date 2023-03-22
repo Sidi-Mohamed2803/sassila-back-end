@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <div th:replace="fragments/head :: Head"></div>
+    <title>Sassila - Éditer section</title>
+</head>
+
+<body>
+    <div class="d-flex" id="wrapper">
+
+        <!-- Sidebar starts here -->
+
+        <div th:insert="fragments/sidebar :: SideBar">
+
+        </div>
+
+        <!-- Sidebar ends here -->
+
+        <div id="page-content-wrapper">
+            <div th:insert="fragments/nav :: Nav(page='Éditer section')"></div>
+
+            <div class="container-fluid px-4">
+                <div class="card mx-auto" style="width: 70%;">
+                    <div class="card-header text-center">
+                        <h2>
+                            Éditer section
+                        </h2>
+                    </div>
+                    <form action="/admin/editer-section" method="post" th:object="${section}" style="padding: 5%;">
+                        <input type="hidden" th:value="${individu.id}" name="individuId">
+                        <input type="hidden" th:field="*{id}">
+
+                        <div class="form-floating">
+                            <input type="text" class="form-control" th:field="*{titre}" name="titre" id="title"
+                                placeholder="Titre" />
+                            <label for="title">Titre<span class="text-danger">*</span></label>
+                        </div>
+                        <span th:if="${#fields.hasErrors('titre')}" th:errors="*{titre}" class="text-danger"></span>
+
+                        <br />
+
+                        <div class="form-floating">
+                            <textarea class="form-control" th:field="*{contenu}" name="contenu" id="content"
+                                placeholder="Contenu"></textarea>
+                            <label for="content">Contenu<span class="text-danger">*</span></label>
+                        </div>
+                        <span th:if="${#fields.hasErrors('contenu')}" th:errors="*{contenu}" class="text-danger"></span>
+
+                        <br />
+
+                        <div class="mb-3">
+                            <label for="showOrder" class="form-label">Ordre d'affichage</label>
+                            <input class="form-control" type="number" id="showOrder" name="ordreAffichage"
+                                th:field="*{ordreAffichage}" min="1" required />
+                        </div>
+                        <span th:if="${#fields.hasErrors('ordreAffichage')}" th:errors="*{ordreAffichage}"
+                            class="text-danger"></span>
+
+                        <br />
+
+                        <div class="row">
+                            <input type="submit" class="col btn btn-primary" value="Enregistrer" />
+                            &nbsp;
+                            <input type="reset" class="col btn btn-secondary" value="Effacer">
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    <div th:insert="fragments/footer :: Footer"></div>
+</body>
+
+</html>

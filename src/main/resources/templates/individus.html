@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <div th:replace="fragments/head :: Head"></div>
+    <title>Tableau de bord</title>
+</head>
+
+<body>
+    <div class="d-flex" id="wrapper">
+
+        <!-- Sidebar starts here -->
+
+        <div th:insert="fragments/sidebar :: SideBar">
+
+        </div>
+
+        <!-- Sidebar ends here -->
+
+        <div id="page-content-wrapper">
+            <div th:insert="fragments/nav :: Nav(page='Membres')"></div>
+
+            <div class="container-fluid px-4">
+                <div class="row my-5">
+                    <h3>Individus enregistrés</h3>
+                    <div class="col">
+                        <table class="table bg-white rounded shadow-sm table-hover text-center">
+                            <thead>
+                                <tr>
+                                    <th scope="col" width="50">#</th>
+                                    <th scope="col">Prénom</th>
+                                    <th scope="col">Nom</th>
+                                    <th scope="col">Date de naissance</th>
+                                    <th scope="col">Résidence</th>
+                                    <th scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="individu: ${individus.content}">
+                                    <th scope="row" th:text="${individu.id}"></th>
+                                    <td th:text="${individu.prenom}"></td>
+                                    <td th:text="${individu.nom}"></td>
+                                    <td th:text="${individu.date_naissance}"></td>
+                                    <td th:text="${individu.residence_actuelle}"></td>
+                                    <td>
+                                        <a th:href="@{/admin/editer-individu/{id}(id=${individu.id})}">
+                                            <i class="fas fa-light fa-file-pen"></i>
+                                        </a>
+                                        &nbsp;
+                                        <a th:href="@{/admin/individu/{id}(id=${individu.id})}">
+                                            <i class="fas fa-regular fa-eye"></i>
+                                        </a>
+                                        &nbsp;
+                                        <a href="#" data-bs-toggle="modal"
+                                            th:attr="data-bs-target='#deleteModal'+${individu.id}">
+                                            <i class="fas fa-light fa-trash-can"></i>
+                                        </a>
+                                    </td>
+                                    <div class="modal fade" tabindex="-1" th:attr="id='deleteModal'+${individu.id}">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Suppression</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p>Voulez-vous supprimer <span
+                                                            th:text="${individu.prenom +' '+individu.nom}"></span>
+                                                        ?
+                                                    </p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary"
+                                                        data-bs-dismiss="modal">Non</button>
+                                                    <a th:href="@{/admin/supprimer-individu/{id}(id=${individu.id})}"
+                                                        class="btn btn-danger">Oui</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div th:if="${individus.totalPages > 0}" style="display: grid; place-items: center;">
+                            <nav aria-label="Individus">
+                                <ul class="pagination">
+                                    <li class="page-item" th:classappend="${currentPage==1} ? disabled : enabled">
+                                        <a class="page-link"
+                                            th:href="@{/admin/individus(size=${individus.size}, page=${currentPage-1})}">Previous</a>
+                                    </li>
+                                    <li class="page-item" th:each="pageNumber : ${pageNumbers}">
+                                        <a class="page-link"
+                                            th:href="@{/admin/individus(size=${individus.size}, page=${pageNumber})}"
+                                            th:text=${pageNumber}
+                                            th:classappend="${pageNumber==individus.number + 1} ? disabled : enabled"></a>
+                                    </li>
+                                    <li class="page-item"
+                                        th:classappend="${currentPage==individus.totalPages} ? disabled : enabled">
+                                        <a class="page-link"
+                                            th:href="@{/admin/individus(size=${individus.size}, page=${currentPage+1})}">Next</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div th:insert="fragments/footer :: Footer"></div>
+</body>
+
+</html>
