@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <div th:replace="fragments/head :: Head"></div>
+    <title th:utext="Sassila +' - '+ ${individu.prenom + ' ' + individu.nom}"></title>
+</head>
+
+<body>
+    <div class="d-flex" id="wrapper">
+
+        <!-- Sidebar starts here -->
+
+        <div th:insert="fragments/sidebar :: SideBar">
+
+        </div>
+
+        <!-- Sidebar ends here -->
+
+        <div id="page-content-wrapper">
+            <div th:insert="fragments/nav :: Nav(page=${individu.prenom + ' ' + individu.nom})"></div>
+
+            <div class="container-fluid px-4">
+                <div class="card" style="margin-bottom: 5%;">
+                    <div style="margin: 0.5rem;">
+                        <div class="row">
+                            <div class="col-md-5">
+                                <div class="profile-links">
+                                    <img th:if="${imageSize == 0}" src="/assets/no-pic.png" alt="">
+                                    <img th:unless="${imageSize == 0}" th:src="@{'/image/display/' + ${individu.id}}"
+                                        alt="">
+                                    <li th:if="${#strings.startsWith(individu.key_,'H')}">
+                                        <a th:href="@{/admin/{id}/epouses(id=${individu.id})}">Épouses</a>
+                                    </li>
+                                    <li th:if="${#strings.startsWith(individu.key_,'F') and individu.epoux != null}">
+                                        <a th:href="@{/admin/individu/{id}(id=${individu.epoux.id})}">Époux</a>
+                                    </li>
+                                    <li th:if="${#strings.startsWith(individu.key_,'F')}">
+                                        <a th:href="@{/admin/{id}/enfants(id=${individu.id})}">Enfants</a>
+                                    </li>
+                                    <li>
+                                        <a th:href="@{/admin/{id}/sections(id=${individu.id})}">Sections</a>
+                                    </li>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mt-custom">
+                                    <div class="details">
+                                        <div class="row">
+                                            <div class="col-8">
+                                                Surnom
+                                            </div>
+                                            <div class="col-4">
+                                                <span th:text="${individu.surnom}"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="details">
+                                        <div class="row">
+                                            <div class="col-8">
+                                                Date de naissance
+                                            </div>
+                                            <div class="col-4">
+                                                <span th:text="${individu.date_naissance}"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="details">
+                                        <div class="row">
+                                            <div class="col-8">
+                                                Lieu de naissance
+                                            </div>
+                                            <div class="col-4">
+                                                <span th:text="${individu.lieu_naissance}"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="details">
+                                        <div class="row">
+                                            <div class="col-8">
+                                                Résidence actuelle
+                                            </div>
+                                            <div class="col-4">
+                                                <span th:text="${individu.residence_actuelle}"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div th:if="${individu.date_deces!=null}" class="details">
+                                        <div class="row">
+                                            <div class="col-8">
+                                                Date de décès
+                                            </div>
+                                            <div class="col-4">
+                                                <span th:text="${individu.date_deces}"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div th:if="${not #strings.isEmpty(individu.lieu_deces)}" class="details">
+                                        <div class="row">
+                                            <div class="col-8">
+                                                Lieu de décès
+                                            </div>
+                                            <div class="col-4">
+                                                <span th:text="${individu.lieu_deces}"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div th:if="${not #strings.isEmpty(individu.cause_deces)}" class="details">
+                                        <div class="row">
+                                            <div class="col-8">
+                                                Cause du décès
+                                            </div>
+                                            <div class="col-4">
+                                                <span th:text="${individu.cause_deces}"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                <h2 class="mt-5">Biographie</h2>
+                                <div th:if="${#lists.isEmpty(sections)}">
+                                    <h3 style="text-align: center;">
+                                        <em>Pour le moment, <span
+                                                th:text="${individu.prenom + ' ' + individu.nom}"></span>
+                                            n'a pas de sections de biographie.</em>
+                                    </h3>
+                                </div>
+                                <div th:each="section : ${sections}">
+                                    <h3 th:text="${section.titre}" style="padding-left: 5%;"></h3>
+                                    <p th:text="${section.contenu}" style="text-align: justify;"></p>
+                                </div>
+                                <br />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    <div th:insert="fragments/footer :: Footer"></div>
+</body>
+
+</html>

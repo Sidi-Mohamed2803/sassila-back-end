@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <div th:replace="fragments/head :: Head"></div>
+    <title>Sassila - Nouvel individu</title>
+</head>
+
+<body>
+    <div class="d-flex" id="wrapper">
+
+        <!-- Sidebar starts here -->
+
+        <div th:insert="fragments/sidebar :: SideBar">
+
+        </div>
+
+        <!-- Sidebar ends here -->
+
+        <div id="page-content-wrapper">
+            <div th:insert="fragments/nav :: Nav(page='Nouvel individu')"></div>
+
+            <div class="container-fluid px-4">
+                <div class="card mx-auto" style="width: 70%;">
+                    <div class="card-header text-center">
+                        <h2>
+                            Éditer individu - <span th:text="${individu.prenom +' '+ individu.nom}"></span></h2>
+                    </div>
+                    <form th:action="@{/admin/editer-individu}" method="post" th:object="${individu}"
+                        enctype="multipart/form-data" style="padding: 5%;">
+                        <input type="hidden" th:value="${individu.id}" th:field="*{id}">
+                        <div class="form-group row">
+                            <div class="col">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" th:field="*{prenom}" name="prenom"
+                                        id="firstName" placeholder="Prénoms" />
+                                    <label for="firstName">Prénoms<span class="text-danger">*</span></label>
+                                </div>
+                                <span th:if="${#fields.hasErrors('prenom')}" th:errors="*{prenom}"
+                                    class="text-danger"></span>
+                            </div>
+                            <div class="col">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" th:field="*{surnom}" name="surnom"
+                                        id="surname" placeholder="Surnom" />
+                                    <label for="surname">Surnom</label>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" th:field="*{nom}" name="nom" id="familyName"
+                                        placeholder="Nom" />
+                                    <label for="familyName">Nom<span class="text-danger">*</span></label>
+                                </div>
+                                <span th:if="${#fields.hasErrors('nom')}" th:errors="*{nom}" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <br />
+
+                        <div class="form-group row">
+                            <div class="col">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">
+                                            <label for="birthDate">Date de naissance<span
+                                                    class="text-danger">*</span></label>
+                                        </div>
+                                    </div>
+                                    <input type="date" th:attr="value=${individu.date_naissance}" class="form-control"
+                                        name="birthDate" id="birthDate" readonly />
+                                </div>
+                                <span th:if="${dateInvalid}" th:text="${dateInvalidMessage}" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <br />
+
+                        <div class="form-group row">
+                            <div class="col">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" th:field="*{lieu_naissance}"
+                                        name="lieu_naissance" id="birthLocation" placeholder="lieu_naissance"
+                                        readonly />
+                                    <label for="birthLocation">Lieu de naissance<span
+                                            class="text-danger">*</span></label>
+                                </div>
+                                <span th:if="${#fields.hasErrors('lieu_naissance')}" th:errors="*{lieu_naissance}"
+                                    class="text-danger"></span>
+                            </div>
+                            <div class="col">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" th:field="*{residence_actuelle}"
+                                        name="residence_actuelle" id="address" placeholder="residence_actuelle" />
+                                    <label for="address">Résidence actuelle<span class="text-danger">*</span></label>
+                                </div>
+                                <span th:if="${#fields.hasErrors('residence_actuelle')}"
+                                    th:errors="*{residence_actuelle}" class="text-danger">
+                                </span>
+                            </div>
+                        </div>
+
+                        <br />
+
+                        <fieldset class="form-group">
+                            <div class="row">
+                                <legend class="col-form-label col-sm-2 pt-0">Genre<span class="text-danger">*</span>
+                                </legend>
+                                <div class="col-sm-10">
+                                    <div class="form-check" th:if="${#strings.startsWith(individu.key_,'H')}">
+                                        <input class="form-check-input" type="radio" name="genre" id="maleRadio"
+                                            value="H" readonly checked>
+                                        <label class="form-check-label" for="maleRadio">
+                                            Homme
+                                        </label>
+                                    </div>
+                                    <div class="form-check" th:if="${#strings.startsWith(individu.key_,'F')}">
+                                        <input class="form-check-input" type="radio" name="genre" id="femaleRadio"
+                                            value="F" readonly checked>
+                                        <label class="form-check-label" for="femaleRadio">
+                                            Femme
+                                        </label>
+                                    </div>
+                                    <span th:if="${genreInvalid}" th:text="${genreInvalidMessage}"
+                                        class="text-danger"></span>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <br />
+
+                        <div class="form-group row">
+                            <div class="col">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">
+                                            <label for="deathDate">Date de décès</label>
+                                        </div>
+                                    </div>
+                                    <input type="date" th:attr="value=${individu.date_deces}" class="form-control"
+                                        name="deathDate" id="deathDate" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <br />
+
+                        <div class="form-group row">
+                            <div class="col">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" th:field="*{lieu_deces}" name="lieu_deces"
+                                        id="deathLocation" placeholder="lieu_deces" />
+                                    <label for="deathLocation">Lieu de décès</label>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" th:field="*{cause_deces}" name="cause_deces"
+                                        id="deathCause" placeholder="cause_deces" />
+                                    <label for="deathCause">Cause du décès</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <br />
+
+                        <div class="mb-3">
+                            <label for="formFile" class="form-label">Photo de la personne</label>
+                            <input class="form-control" type="file" id="formFile" name="image"
+                                accept="image/png, image/jpeg, image/jpg">
+                        </div>
+
+                        <br />
+
+                        <div class="row">
+                            <input type="submit" class="col btn btn-primary" value="Enregistrer" />
+                            &nbsp;
+                            <input type="reset" class="col btn btn-secondary" value="Effacer">
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    <div th:insert="fragments/footer :: Footer"></div>
+</body>
+
+</html>

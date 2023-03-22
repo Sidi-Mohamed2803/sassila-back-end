@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <div th:replace="fragments/head :: Head"></div>
+    <title>Sassila - Nouvel individu</title>
+</head>
+
+<body>
+    <div class="d-flex" id="wrapper">
+
+        <!-- Sidebar starts here -->
+
+        <div th:insert="fragments/sidebar :: SideBar">
+
+        </div>
+
+        <!-- Sidebar ends here -->
+
+        <div id="page-content-wrapper">
+            <div th:insert="fragments/nav :: Nav(page='Nouvel individu')"></div>
+
+            <div class="container-fluid px-4">
+                <div class="card mx-auto text-center" style="width: 70%;">
+                    <div class="card-header">
+                        <h2>
+                            Ajouter des enfants à <span th:text="${individu.prenom +' '+ individu.nom}"></span></h2>
+                    </div>
+                    <form th:action="@{/admin/ajouter-enfants}" method="post" th:object="${intermediaire}"
+                        style="padding: 5%;">
+                        <input type="hidden" th:value="${intermediaire.id}" name="individuId">
+                        <select class="form-control" name="individus" id="individu" th:field="*{enfants}" multiple>
+                            <option th:each="enfant : ${enfants}" th:value="${enfant.id}"
+                                th:text="${enfant.prenom +' '+ enfant.nom}"></option>
+                        </select>
+                        <br />
+                        <input class="btn btn-primary" type="submit" value="Affecter">
+                    </form>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    <div th:insert="fragments/footer :: Footer"></div>
+</body>
+
+</html>
