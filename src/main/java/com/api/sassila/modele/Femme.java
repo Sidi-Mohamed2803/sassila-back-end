@@ -30,13 +30,29 @@ public class Femme extends Individu{
         }
     }
 
+    public void divorce(Homme epoux) {
+        if (this.getEpoux().equals(epoux)) {
+            this.epoux = null;
+        }
+    }
+
     public void addChild(Individu child){
         if (child == null || this.getEnfants().contains(child)) {
             return;
         }
         this.getEnfants().add(child);
-        if (this.getEpoux()!=null) {
+        if (this.getEpoux()!=null && !this.getEpoux().getEnfants().contains(child)) {
             this.getEpoux().getEnfants().add(child);
+        }
+    }
+
+    public void removeChild(Individu child) {
+        if (child == null || !this.getEnfants().contains(child)) {
+            return;
+        }
+        this.getEnfants().remove(child);
+        if (this.getEpoux()!=null && this.getEpoux().getEnfants().contains(child)) {
+            this.getEpoux().getEnfants().remove(child);
         }
     }
 

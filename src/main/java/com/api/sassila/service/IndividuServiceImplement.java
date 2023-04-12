@@ -16,10 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Service
@@ -78,8 +75,41 @@ public class IndividuServiceImplement implements IndividuService{
     }
 
     @Override
-    public List<Individu> recupererHommes() {
-        return individuRepository.findAllHommes();
+    public Page<Individu> recupererIndividusPageParNomEtPrenom(Pageable pageable, String prenom, String nom) {
+        int pageSize = pageable.getPageSize();
+        int currentPage = pageable.getPageNumber();
+        int startItem = currentPage * pageSize;
+
+        List<Individu> list;
+        List<Individu> individus = individuRepository.findAll();
+        List<Individu> results = new ArrayList<>();
+        log.info(prenom);
+        for (Individu individu : individus) {
+            if (individu.getPrenom().toLowerCase().contains(prenom.toLowerCase()) && individu.getNom().toLowerCase().contains(nom.toLowerCase())) {
+                log.info(individu+"");
+                results.add(individu);
+            }
+        }
+
+
+        if(results.size() < startItem) {
+            list = Collections.emptyList();
+        } else {
+            int toIndex = Math.min(startItem + pageSize, results.size());
+            list = results.subList(startItem, toIndex);
+        }
+
+        return new PageImpl<>(list, PageRequest.of(currentPage,pageSize),results.size());
+    }
+
+    @Override
+    public List<Individu> recupererIndividusRecent() {
+        return individuRepository.findTop10ByOrderByIdDesc();
+    }
+
+    @Override
+    public List<Homme> recupererHommes() {
+        return hommeRepository.findAll();
     }
 
     @Override
@@ -103,14 +133,68 @@ public class IndividuServiceImplement implements IndividuService{
     }
 
     @Override
-    public void affecterEnfants(Femme femme, List<Individu> enfants) {
+    public List<Individu> recupererSansParents() {
+        CustomRepository customRepository = new CustomRepository(individuRepository);
+        return customRepository.findAllWithoutParent();
+    }
+
+    @Override
+    public void affecterEnfants(Individu individu, List<Individu> enfants) {
+        if (individu.getKey_().startsWith("F")) {
+            for (Individu enfant :
+                    enfants) {
+                if (!individu.getEnfants().contains(enfant)) {
+                    ((Femme) individu).addChild(enfant);
+                }
+            }
+            if (((Femme) individu).getEpoux() != null) enregistrerIndividu(((Femme) individu).getEpoux());
+        } else {
+            for (Individu enfant :
+                    enfants) {
+                if (!individu.getEnfants().contains(enfant)) {
+                    individu.ajouterEnfantIndependant(enfant);
+                }
+            }
+        }
+        enregistrerIndividu(individu);
+    }
+
+    @Override
+    public void affecterEnfants(Individu individu, List<Individu> enfants, Individu conjoint) {
         for (Individu enfant :
                 enfants) {
-            if (!femme.getEnfants().contains(enfant))
-                femme.addChild(enfant);
+            if (!individu.getEnfants().contains(enfant)) {
+                individu.ajouterEnfantIndependant(enfant);
+            }
+            if (!conjoint.getEnfants().contains(enfant)) {
+                conjoint.ajouterEnfantIndependant(enfant);
+            }
         }
-        enregistrerIndividu(femme);
-        if (femme.getEpoux() != null) enregistrerIndividu(femme.getEpoux());
+        enregistrerIndividu(individu);
+        enregistrerIndividu(conjoint);
+    }
+
+    @Override
+    public void retirerEnfant(Individu individu, Individu enfant) {
+        if (individu.getKey_().startsWith("F")) {
+            ((Femme) individu).removeChild(enfant);
+            enregistrerIndividu(individu);
+            if (((Femme) individu).getEpoux() != null) enregistrerIndividu(((Femme) individu).getEpoux());
+        } else {
+            individu.retirerEnfant(enfant);
+            enregistrerIndividu(individu);
+        }
+    }
+
+    @Override
+    public void divorcer(Homme epoux, Femme epouse) {
+        if (epoux!=null && epouse!=null) {
+            if (epoux.getEpouses().contains(epouse)) {
+                epoux.divorcer(epouse);
+                enregistrerIndividu(epouse);
+                enregistrerIndividu(epoux);
+            }
+        }
     }
 
     @Override
@@ -131,25 +215,24 @@ public class IndividuServiceImplement implements IndividuService{
     }
 
     @Override
-    @Transactional
     public boolean supprimerIndividu(Long id) {
+        CustomRepository customRepository = new CustomRepository(individuRepository);
         Optional<Individu> optionalIndividu = individuRepository.findById(id);
         if (optionalIndividu.isEmpty()) return false;
         Individu individu = optionalIndividu.get();
-//        if (individu.getKey_().startsWith("F")) {
-//            femmeRepository.deleteById(id);
-//        }
-//        if (individu.getKey_().startsWith("H")) {
-//            CustomRepository.deleteMariageRelation(individu.getKey_());
-//            hommeRepository.deleteById(id);
-//        }
-//        CustomRepository.deleteChildrenRelation(individu.getKey_());
-        individuRepository.deleteById(id);
+        customRepository.deleteChildrenRelation(individu.getId());
+        if (individu.getKey_().startsWith("F")) {
+            femmeRepository.deleteById(id);
+        }
+        if (individu.getKey_().startsWith("H")) {
+            customRepository.deleteMariageRelation(individu.getId());
+            hommeRepository.deleteById(id);
+        }
+
         return true;
     }
 
     @Override
-    @Transactional
     public boolean modifierIndividu(Individu edited) {
         boolean exists = individuRepository.existsById(edited.getId());
         if(!exists) {
@@ -188,6 +271,4 @@ public class IndividuServiceImplement implements IndividuService{
     public long countFemmes() {
         return femmeRepository.count();
     }
-
-
 }

@@ -20,13 +20,13 @@
         <div id="page-content-wrapper">
             <div th:insert="fragments/nav :: Nav(page='Sections')"></div>
 
-            <div class="container-fluid px-4">
+            <div class="container-fluid px-4 vh-85" style="height: 85vh; overflow-y: scroll;">
                 <div style="display: flex; justify-content: center; align-items: center;">
                     <a th:href="@{/admin/{id}/ajouter-section(id=${individu.id})}" class="btn btn-primary"><i
                             class="fas fa-plus"></i> Ajouter section</a>
                 </div>
                 <div class="row my-5">
-                    <h3>Sections de <span th:text="${individu.prenom+' '+individu.nom}"></span></h3>
+                    <h3>Sections de <a th:href="@{/admin/individu/{id}(id=${individu.id})}" th:text="${individu.prenom+' '+individu.nom}"></a></h3>
                     <div class="col">
                         <table class="table bg-white rounded shadow-sm table-hover text-center">
                             <thead>
@@ -74,7 +74,7 @@
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-secondary"
                                                         data-bs-dismiss="modal">Non</button>
-                                                    <a th:href="@{/admin/supprimer-section/{id}(id=${section.id})}"
+                                                    <a th:href="@{/admin/{individuId}/supprimer-section/{sectionId}(individuId=${individu.id}, sectionId=${section.id})}"
                                                         class="btn btn-danger">Oui</a>
                                                 </div>
                                             </div>

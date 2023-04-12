@@ -75,39 +75,39 @@
   background-color: rgb(122, 179, 243);
   padding: 30px 20px;
   text-align: center;
-  margin: 100px 70px 0 70px;
+  margin: 0 10% 0 10%;
   border-radius: 10px;
 }
 
 .profile-links li {
-  margin: 10px 0;
+  margin: 5px 0;
   display: block;
 }
 
 .profile-links li a {
   color: white;
   text-decoration: none;
-  margin: 10px 0;
+  margin: 5px 0;
   display: inline-block;
 }
 
 .profile-links img {
-  width: 250px;
-  height: 250px;
+  width: 70%;
+  height: 70%;
   border-radius: 50%;
   display: inline-block;
   margin-bottom: 25px;
 }
 
 .mt-custom {
-  margin-top: 100px;
+  margin-top: 10px;
 }
 
 .mt-custom .details {
   border-bottom: 1px solid #9fc9f0;
-  padding: 20px;
+  padding: 10px;
 }
-
+/* 
 @media (max-width:1200px) {
   .profile-links {
     background-color: rgb(122, 179, 243);
@@ -151,7 +151,7 @@
   color: var(--main-text-color);
   font-weight: bold;
   border: none;
-}
+} */
 
 @media (min-width: 768px) {
   #sidebar-wrapper {

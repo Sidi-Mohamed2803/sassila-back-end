@@ -175,6 +175,14 @@ public class Individu {
         this.enfants = enfants;
     }
 
+    public void ajouterEnfantIndependant(Individu enfant){
+        if (!this.getEnfants().contains(enfant)) this.getEnfants().add(enfant);
+    }
+
+    public void retirerEnfant(Individu enfant) {
+        this.enfants.remove(enfant);
+    }
+
     @Override
     public String toString() {
         return "Individu{" +

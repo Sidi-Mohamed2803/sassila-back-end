@@ -1,5 +1,6 @@
 package com.api.sassila;
 
+import com.api.sassila.customRepo.CustomRepository;
 import com.api.sassila.modele.Femme;
 import com.api.sassila.modele.Homme;
 import com.api.sassila.modele.Individu;
@@ -31,13 +32,14 @@ import static java.lang.System.out;
 @SpringBootApplication
 @Slf4j
 public class SassilaApplication {
-	static ApplicationContext ctx;
 
 	public static void main(String[] args) {
-		ctx = SpringApplication.run(SassilaApplication.class, args);
+		ApplicationContext ctx = SpringApplication.run(SassilaApplication.class, args);
 
-		IndividuRepository individuRepository = ctx.getBean(IndividuRepository.class);
-		IndividuServiceImplement individuServiceImplement = ctx.getBean(IndividuServiceImplement.class);
+//		IndividuRepository individuRepository = ctx.getBean(IndividuRepository.class);
+//		IndividuServiceImplement individuServiceImplement = ctx.getBean(IndividuServiceImplement.class);
+//		CustomRepository customRepository = new CustomRepository(individuRepository);
+//		customRepository.findAllWithoutParent();
 //		Homme minato = (Homme) individuServiceImplement.recupererUnIndividu("H01011970TOUMINA3");
 //		Femme kushina = (Femme) individuServiceImplement.recupererUnIndividu("F01011970KONKUUZ4");
 //		log.info(minato.getEnfants().size()+" Kushina's children");

@@ -3,7 +3,7 @@
 
 <head>
     <div th:replace="fragments/head :: Head"></div>
-    <title>Sassila - Nouvel individu</title>
+    <title>Sassila - Ajouter enfants</title>
 </head>
 
 <body>
@@ -18,21 +18,36 @@
         <!-- Sidebar ends here -->
 
         <div id="page-content-wrapper">
-            <div th:insert="fragments/nav :: Nav(page='Nouvel individu')"></div>
+            <div th:insert="fragments/nav :: Nav(page='Ajouter enfants')"></div>
 
-            <div class="container-fluid px-4">
+            <div class="container-fluid px-4 vh-85" style="height: 85vh; overflow-y: scroll;">
                 <div class="card mx-auto text-center" style="width: 70%;">
                     <div class="card-header">
                         <h2>
-                            Ajouter des enfants à <span th:text="${individu.prenom +' '+ individu.nom}"></span></h2>
+                            Ajouter des enfants à <a th:href="@{/admin/individu/{id}(id=${individu.id})}" th:text="${individu.prenom +' '+ individu.nom}"></a></h2>
                     </div>
                     <form th:action="@{/admin/ajouter-enfants}" method="post" th:object="${intermediaire}"
                         style="padding: 5%;">
                         <input type="hidden" th:value="${intermediaire.id}" name="individuId">
-                        <select class="form-control" name="individus" id="individu" th:field="*{enfants}" multiple>
-                            <option th:each="enfant : ${enfants}" th:value="${enfant.id}"
-                                th:text="${enfant.prenom +' '+ enfant.nom}"></option>
-                        </select>
+                        <div class="row" style="display: flex; justify-content: center; align-items: center;">
+                            <div class="col-md-6">
+                                <label for="epouse"><h4>Sélectionner l'enfant</h4></label>
+                                <select class="form-control" name="enfants" id="enfant" th:field="*{enfants}" th:attr="multiple=${#strings.startsWith(individu.key_,'F')}">
+                                    
+                                    <option th:each="enfant : ${enfants}" th:value="${enfant.id}"
+                                        th:text="${enfant.prenom +' '+ enfant.nom}"></option>
+                                </select>
+                            </div>
+                            <br />
+                            <div class="col-md-6" th:if="${#strings.startsWith(individu.key_,'H')}">
+                                <label for="conjointId"><h4>Sélectionner la mère de l'enfant</h4></label>
+                                <select class="form-control" name="conjointId" id="epouse">
+                                    <option value="0" selected>Hors-mariage</option>
+                                    <option th:each="epouse : ${epouses}" th:value="${epouse.id}"
+                                        th:text="${epouse.prenom +' '+ epouse.nom}"></option>
+                                </select>
+                            </div>
+                        </div>
                         <br />
                         <input class="btn btn-primary" type="submit" value="Affecter">
                     </form>

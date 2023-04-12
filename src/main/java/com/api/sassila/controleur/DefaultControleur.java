@@ -22,16 +22,11 @@ public class DefaultControleur {
 
     @GetMapping
     public String dashboard(Model model) {
-        ArrayList<Individu> individuArrayList = (ArrayList<Individu>) individuServiceImplement.recupererIndividus();
-        Map<Integer, Individu> lastIndividus = new TreeMap<>();
-        int j = 0;
-        for (int i = individuArrayList.size(); i > individuArrayList.size() - 5; i--) {
-            lastIndividus.put(++j, individuArrayList.get(i - 1));
-        }
+        ArrayList<Individu> individus = (ArrayList<Individu>) individuServiceImplement.recupererIndividusRecent();
         model.addAttribute("nbreIndividus", individuServiceImplement.countIndividus());
         model.addAttribute("nbreHommes", individuServiceImplement.countHommes());
         model.addAttribute("nbreFemmes", individuServiceImplement.countFemmes());
-        model.addAttribute("individus", lastIndividus);
+        model.addAttribute("individus", individus);
         return "dashboard";
     }
 }

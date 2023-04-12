@@ -1051,7 +1051,9 @@ readers do not read off random characters that represent icons */
   content: "\e50c"; }
 
 .fa-square-minus::before {
-  content: "\f146"; }
+  content: "\f146";
+  color: orange
+  }
 
 .fa-minus-square::before {
   content: "\f146"; }

@@ -20,13 +20,19 @@
         <div id="page-content-wrapper">
             <div th:insert="fragments/nav :: Nav(page='Enfants')"></div>
 
-            <div class="container-fluid px-4">
+            <div class="container-fluid px-4 vh-85" style="height: 85vh; overflow-y: scroll;">
                 <div style="display: flex; justify-content: center; align-items: center;">
-                    <a th:href="@{/admin/{id}/ajouter-enfant(id=${individu.id})}" class="btn btn-primary"><i
+                    <a th:href="@{/admin/{id}/ajouter-enfants(id=${individu.id})}" class="btn btn-primary btn-lg"><i
                             class="fas fa-plus"></i> Ajouter enfant</a>
                 </div>
+                <br/>
+                <div th:if="${#strings.startsWith(individu.key_,'F')}" style="display: flex; justify-content: center; align-items: center;">
+                    <a th:href="@{/admin/{id}/ajouter-enfants-anterieurs(id=${individu.id})}" class="btn btn-primary btn-small"><i
+                            class="fas fa-plus"></i> Ajouter enfant (Mariage antérieur ou Hors-mariage)</a>
+                </div>
                 <div class="row my-5">
-                    <h3>Individus enregistrés</h3>
+                    <h3>Enfants de <a th:href="@{/admin/individu/{id}(id=${individu.id})}"
+                            th:text="${individu.prenom +' '+individu.nom}"></a></h3>
                     <div class="col">
                         <table class="table bg-white rounded shadow-sm table-hover text-center">
                             <thead>
@@ -57,7 +63,7 @@
                                         &nbsp;
                                         <a href="#" data-bs-toggle="modal"
                                             th:attr="data-bs-target='#deleteModal'+${enfant.id}">
-                                            <i class="fas fa-light fa-trash-can"></i>
+                                            <i class="fas fa-solid fa-square-minus"></i>
                                         </a>
                                     </td>
                                     <div class="modal fade" tabindex="-1" th:attr="id='deleteModal'+${enfant.id}">
@@ -69,15 +75,16 @@
                                                         aria-label="Close"></button>
                                                 </div>
                                                 <div class="modal-body">
-                                                    <p>Voulez-vous supprimer <span
-                                                            th:text="${enfant.prenom +' '+enfant.nom}"></span>
+                                                    <p>Voulez-vous retirer <span
+                                                            th:text="${enfant.prenom +' '+enfant.nom}"></span> parmi les enfants de <span
+                                                            th:text="${individu.prenom +' '+individu.nom}"></span>
                                                         ?
                                                     </p>
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-secondary"
                                                         data-bs-dismiss="modal">Non</button>
-                                                    <a th:href="@{/admin/supprimer-individu/{id}(id=${enfant.id})}"
+                                                    <a th:href="@{/admin/{individuId}/retirer-enfant/{enfantId}(individuId=${individu.id}, enfantId=${enfant.id})}"
                                                         class="btn btn-danger">Oui</a>
                                                 </div>
                                             </div>

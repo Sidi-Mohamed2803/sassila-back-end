@@ -20,7 +20,7 @@
         <div id="page-content-wrapper">
             <div th:insert="fragments/nav :: Nav(page='Nouvel individu')"></div>
 
-            <div class="container-fluid px-4">
+            <div class="container-fluid px-4 vh-85" style="height: 85vh; overflow-y: scroll;">
                 <div class="card mx-auto" style="width: 70%;">
                     <div class="card-header text-center">
                         <h2>
@@ -68,7 +68,7 @@
                                         </div>
                                     </div>
                                     <input type="date" th:attr="value=${individu.date_naissance}" class="form-control"
-                                        name="birthDate" id="birthDate" readonly />
+                                        name="birthDate" id="birthDate" />
                                 </div>
                                 <span th:if="${dateInvalid}" th:text="${dateInvalidMessage}" class="text-danger"></span>
                             </div>
@@ -80,8 +80,7 @@
                             <div class="col">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" th:field="*{lieu_naissance}"
-                                        name="lieu_naissance" id="birthLocation" placeholder="lieu_naissance"
-                                        readonly />
+                                        name="lieu_naissance" id="birthLocation" placeholder="lieu_naissance" />
                                     <label for="birthLocation">Lieu de naissance<span
                                             class="text-danger">*</span></label>
                                 </div>

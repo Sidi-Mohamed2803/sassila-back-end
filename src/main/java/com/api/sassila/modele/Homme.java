@@ -73,6 +73,13 @@ public class Homme extends Individu {
         }
     }
 
+    public void divorcer(Femme epouse) {
+        if (epouse!=null) {
+            this.getEpouses().remove(epouse);
+            epouse.divorce(this);
+        }
+    }
+
     @Override
     public String toString() {
         return "Homme{" +

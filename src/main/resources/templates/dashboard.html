@@ -19,8 +19,8 @@
         <div id="page-content-wrapper">
             <div th:insert="fragments/nav :: Nav(page='Tableau de bord')"></div>
 
-            <div class="container-fluid px-4">
-                <div class="row g-3 my-2">
+            <div class="container-fluid px-4 vh-85" style="height: 85vh; overflow-y: scroll;">
+                <div class="row g-3 my-2" style="display: flex; justify-content: center; align-items: center;">
                     <div class="col-md-3">
                         <div class="p-3 bg-white shadow-sm d-flex justify-content-around align-items-center rounded">
                             <div>
@@ -81,25 +81,48 @@
                             </thead>
                             <tbody>
                                 <tr th:each="individu: ${individus}">
-                                    <th scope="row" th:text="${individu.value.id}"></th>
-                                    <td th:text="${individu.value.prenom}"></td>
-                                    <td th:text="${individu.value.nom}"></td>
-                                    <td th:text="${individu.value.date_naissance}"></td>
-                                    <td th:text="${individu.value.residence_actuelle}"></td>
+                                    <th scope="row" th:text="${individu.id}"></th>
+                                    <td th:text="${individu.prenom}"></td>
+                                    <td th:text="${individu.nom}"></td>
+                                    <td th:text="${individu.date_naissance}"></td>
+                                    <td th:text="${individu.residence_actuelle}"></td>
                                     <td>
-                                        <a th:href="@{/admin/editer-individu/{id}(id=${individu.value.id})}">
+                                        <a th:href="@{/admin/editer-individu/{id}(id=${individu.id})}">
                                             <i class="fas fa-light fa-file-pen"></i>
                                         </a>
                                         &nbsp;
-                                        <a th:href="@{/admin/individu/{id}(id=${individu.value.id})}">
+                                        <a th:href="@{/admin/individu/{id}(id=${individu.id})}">
                                             <i class="fas fa-regular fa-eye"></i>
                                         </a>
                                         &nbsp;
-                                        <a th:href="@{/admin/supprimer-individu/{id}(id=${individu.value.id})}"
-                                            data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                        <a href="#" data-bs-toggle="modal"
+                                            th:attr="data-bs-target='#deleteModal'+${individu.id}">
                                             <i class="fas fa-light fa-trash-can"></i>
                                         </a>
                                     </td>
+                                    <div class="modal fade" tabindex="-1" th:attr="id='deleteModal'+${individu.id}">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Suppression</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p>Voulez-vous supprimer <span
+                                                            th:text="${individu.prenom +' '+individu.nom}"></span>
+                                                        ?
+                                                    </p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary"
+                                                        data-bs-dismiss="modal">Non</button>
+                                                    <a th:href="@{/admin/supprimer-individu/{id}(id=${individu.id})}"
+                                                        class="btn btn-danger">Oui</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </tr>
 
                             </tbody>

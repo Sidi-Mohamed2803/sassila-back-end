@@ -22,7 +22,10 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -36,25 +39,27 @@ public class AdminControleur {
 
     @GetMapping(path = "/**")
     public String dashboard(Model model) {
-        ArrayList<Individu> individuArrayList = (ArrayList<Individu>) individuServiceImplement.recupererIndividus();
-        Map<Integer, Individu> lastIndividus = new TreeMap<>();
-        int j = 0;
-        for (int i = individuArrayList.size(); i > individuArrayList.size() - 5; i--) {
-            lastIndividus.put(++j, individuArrayList.get(i - 1));
-        }
+        ArrayList<Individu> individus = (ArrayList<Individu>) individuServiceImplement.recupererIndividusRecent();
         model.addAttribute("nbreIndividus", individuServiceImplement.countIndividus());
         model.addAttribute("nbreHommes", individuServiceImplement.countHommes());
         model.addAttribute("nbreFemmes", individuServiceImplement.countFemmes());
-        model.addAttribute("individus", lastIndividus);
+        model.addAttribute("individus", individus);
         return "dashboard";
     }
 
+    /* ************************************************INDIVIDUS***************************************************** */
+
     @GetMapping(path = "individus")
-    public String individus(Model model, @RequestParam("page") Optional<Integer> page, @RequestParam("size") Optional<Integer> size) {
-        ArrayList<Individu> individuArrayList = (ArrayList<Individu>) individuServiceImplement.recupererIndividus();
+    public String individus(Model model, @RequestParam("page") Optional<Integer> page, @RequestParam("size") Optional<Integer> size, @RequestParam("nom") Optional<String> nom, @RequestParam("prenom") Optional<String> prenom) {
         int currentPage = page.orElse(1);
         int pageSize = size.orElse(10);
-        Page<Individu> individuPage = individuServiceImplement.recupererIndividusPage(PageRequest.of(currentPage - 1, pageSize));
+        Page<Individu> individuPage;
+
+        if (nom.isEmpty() && prenom.isEmpty()) {
+            individuPage = individuServiceImplement.recupererIndividusPage(PageRequest.of(currentPage - 1, pageSize));
+        } else {
+            individuPage = individuServiceImplement.recupererIndividusPageParNomEtPrenom(PageRequest.of(currentPage - 1, pageSize), prenom.orElse(""), nom.orElse(""));
+        }
 
         int totalPages = individuPage.getTotalPages();
         if (totalPages> 0) {
@@ -69,14 +74,6 @@ public class AdminControleur {
         return "individus";
     }
 
-    @GetMapping(path = "mariage/{key}")
-    public String mariage(Model model, @PathVariable(name = "key") String key) {
-        ArrayList<Femme> femmes = (ArrayList<Femme>) individuServiceImplement.recupererFemmes();
-        model.addAttribute("hommes", individuServiceImplement.recupererHommes());
-        model.addAttribute("femmes", femmes);
-        return "mariage";
-    }
-
     @GetMapping(path = "individu/{id}")
     public String individu(Model model, @PathVariable(name = "id") long id) {
         Optional<Individu> optionalIndividu = individuServiceImplement.recupererUnIndividu(id);
@@ -86,153 +83,6 @@ public class AdminControleur {
         model.addAttribute("imageSize", individu.getImageUrl() == null ? 0 : individu.getImageUrl().length);
         model.addAttribute("sections", sectionServiceImplement.recupererSectionsParIndividu(id));
         return "individu";
-    }
-
-    @GetMapping(path = "{id}/epouses")
-    public String individuSpouses(Model model, @PathVariable(name = "id") long id) {
-        Optional<Homme> optionalHomme = individuServiceImplement.recupererUnHomme(id);
-        if (optionalHomme.isPresent()) {
-            Homme epoux = optionalHomme.get();
-            model.addAttribute("individu", epoux);
-            model.addAttribute("imageSize", epoux.getImageUrl() == null ? 0 : epoux.getImageUrl().length);
-            model.addAttribute("epouses", epoux.getEpouses());
-            return "spouses";
-        }
-        return "redirect:/admin/individus";
-    }
-
-    @GetMapping(path = "{id}/enfants")
-    public String enfants(Model model, @PathVariable(name = "id") long id) {
-        Optional<Individu> optionalIndividu = individuServiceImplement.recupererUnIndividu(id);
-        if (optionalIndividu.isEmpty()) return "redirect:/admin/individus";
-        Individu individu = optionalIndividu.get();
-        model.addAttribute("individu", individu);
-        model.addAttribute("enfants", individu.getEnfants());
-        return "enfants";
-    }
-
-    @GetMapping(path = "{id}/sections")
-    public String individuSections(Model model, @PathVariable(name = "id") long id) {
-        Optional<Individu> optionalIndividu = individuServiceImplement.recupererUnIndividu(id);
-        if (optionalIndividu.isEmpty()) return "redirect:/admin/individus";
-        Individu individu = optionalIndividu.get();
-        model.addAttribute("individu", individu);
-        model.addAttribute("imageSize", individu.getImageUrl() == null ? 0 : individu.getImageUrl().length);
-        model.addAttribute("sections", sectionServiceImplement.recupererSectionsParIndividu(id));
-        return "sections";
-    }
-
-    @GetMapping(path = "{id}/ajouter-enfant")
-    public String ajouterEnfants(Model model, @PathVariable(name = "id") long id) {
-        Optional<Individu> optionalIndividu = individuServiceImplement.recupererUnIndividu(id);
-        if (optionalIndividu.isEmpty()) return "redirect:/admin/individus";
-        Individu individu = optionalIndividu.get();
-        model.addAttribute("individu", individu);
-        Individu intermediaire = new Individu();
-        intermediaire.setId(id);
-        model.addAttribute("intermediaire", intermediaire);
-        ArrayList<Individu> individus = (ArrayList<Individu>) individuServiceImplement.recupererIndividus();
-        individus.remove(individu);
-        if (individu.getKey_().startsWith("H")) individus.removeAll(((Homme) individu).getEpouses());
-        else if (individu.getKey_().startsWith("F")) individus.remove(((Femme) individu).getEpoux());
-        individus.remove(individu);
-        for (int i = 0; i < individu.getEnfants().size(); i++) {
-            individus.remove(individu.getEnfants().get(i));
-        }
-        model.addAttribute("enfants", individus);
-        return "ajouterEnfant";
-    }
-
-    @GetMapping(path = "{id}/ajouter-section")
-    public String ajouterSection(Model model, @PathVariable(name = "id") long id) {
-        Optional<Individu> optionalIndividu = individuServiceImplement.recupererUnIndividu(id);
-        if (optionalIndividu.isEmpty()) return "redirect:/admin/individus";
-        Individu individu = optionalIndividu.get();
-        model.addAttribute("individu", individu);
-        model.addAttribute("section", new Section());
-        return "newSection";
-    }
-
-    @PostMapping(path = "ajouter-section")
-    public String addingSection(@Valid @ModelAttribute("section") Section section, BindingResult bindingResult, long individuId, Model model) {
-        Optional<Individu> optionalIndividu = individuServiceImplement.recupererUnIndividu(individuId);
-        if (optionalIndividu.isEmpty()) return "redirect:/admin/individus";
-        Individu individu = optionalIndividu.get();
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("section", section);
-            model.addAttribute("individu", individu);
-            return "newSection";
-        }
-        sectionServiceImplement.ajouterSection(section, individuId);
-        return "redirect:/admin/"+individuId+"/sections";
-    }
-
-    @GetMapping(path = "{individuId}/editer-section/{sectionId}")
-    public String editerSection(Model model, @PathVariable(name = "individuId") long individuId, @PathVariable(name = "sectionId") long sectionId) {
-        Optional<Individu> optionalIndividu = individuServiceImplement.recupererUnIndividu(individuId);
-        if (optionalIndividu.isEmpty()) return "redirect:/admin/individus";
-        Optional<Section> optionalSection = sectionServiceImplement.recupererUneSection(sectionId);
-        if (optionalSection.isEmpty()) return "redirect:/admin/individus";
-        model.addAttribute("individu", optionalIndividu.get());
-        model.addAttribute("section", optionalSection.get());
-        return "editSection";
-    }
-
-    @PostMapping(path = "editer-section")
-    public String editingSection(@Valid @ModelAttribute("section") Section section, BindingResult bindingResult, long individuId, Model model) {
-        Optional<Individu> optionalIndividu = individuServiceImplement.recupererUnIndividu(individuId);
-        if (optionalIndividu.isEmpty()) return "redirect:/admin/individus";
-        Individu individu = optionalIndividu.get();
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("section", section);
-            model.addAttribute("individu", individu);
-            return "editSection";
-        }
-        sectionServiceImplement.modifierSection(section.getId(), section.getTitre(),section.getContenu(),section.getOrdreAffichage());
-        return "redirect:/admin/"+individuId+"/sections";
-    }
-
-    @PostMapping(path = "supprimer-section/{id}")
-    public String deleteSection(@PathVariable(name = "id") long id) {
-        sectionServiceImplement.supprimerSection(id);
-        return "redirect:/admin/"+id+"/sections";
-    }
-
-    @PostMapping("ajouter-enfants")
-    public String addingEnfants(@ModelAttribute("intermediaire") Individu intermediaire, Model model, long individuId) {
-        Optional<Femme> optionalFemme = individuServiceImplement.recupererUneFemme(individuId);
-        if (optionalFemme.isEmpty()) return "redirect:/admin/individus";
-        Femme femme = optionalFemme.get();
-        individuServiceImplement.affecterEnfants(femme, intermediaire.getEnfants());
-        return "redirect:/admin/" + individuId + "/enfants";
-    }
-
-    @GetMapping(path = "{id}/ajouter-epouse")
-    public String ajouterEpouses(Model model, @PathVariable(name = "id") long id) {
-        Optional<Homme> optionalHomme = individuServiceImplement.recupererUnHomme(id);
-        if (optionalHomme.isEmpty()) return "";
-        Homme individu = optionalHomme.get();
-        Homme intermediaire = new Homme();
-        intermediaire.setId(id);
-        model.addAttribute("individu", individu);
-        model.addAttribute("intermediaire", intermediaire);
-        ArrayList<Femme> individus = (ArrayList<Femme>) individuServiceImplement.recupererFemmes();
-        individus.removeAll(individu.getEpouses());
-        for (int i = 0; i < individu.getEnfants().size(); i++) {
-            if (individu.getEnfants().get(i).getKey_().startsWith("F"))
-                individus.remove(((Femme) individu.getEnfants().get(i)));
-        }
-        model.addAttribute("epouses", individus);
-        return "mariage";
-    }
-
-    @PostMapping("ajouter-epouses")
-    public String addingEpouses(@ModelAttribute("intermediaire") Homme intermediaire, Model model, long individuId) {
-        Optional<Homme> optionalHomme = individuServiceImplement.recupererUnHomme(individuId);
-        if (optionalHomme.isEmpty()) return "redirect:/admin/individus";
-        Homme femme = optionalHomme.get();
-        individuServiceImplement.affecterEpouses(femme, intermediaire.getEpouses());
-        return "redirect:/admin/" + individuId + "/epouses";
     }
 
     @GetMapping(path = "nouvel-individu")
@@ -249,12 +99,12 @@ public class AdminControleur {
             model.addAttribute("genreInvalid", true);
             model.addAttribute("genreInvalidMessage", "Veuillez sélectionner un genre");
         }
-        if (birthDate == null || birthDate.isEmpty()) {
-            bindingResult.addError(new ObjectError("date_naissance", "Veuillez donner une date de naissance"));
-            model.addAttribute("dateInvalid", true);
-            model.addAttribute("dateInvalidMessage", "Veuillez donner une date de naissance");
+        if (birthDate == null || birthDate.equals("")) {
+            bindingResult.addError(new ObjectError("date_naissance", "Veuillez donner une date de naissance."));
+            model.addAttribute("birthDateInvalid", true);
+            model.addAttribute("birthDateInvalidMessage", "Veuillez donner une date de naissance.");
         } else if (LocalDate.parse(birthDate).isAfter(LocalDate.now())) {
-            bindingResult.addError(new ObjectError("date_naissance", "Veuillez donner une date de naissance"));
+            bindingResult.addError(new ObjectError("date_naissance", "Veuillez donner une date de naissance."));
             model.addAttribute("birthDateInvalid", true);
             model.addAttribute("birthDateInvalidMessage", "La date de naissance doit être inférieure à la date du jour.");
         }
@@ -263,10 +113,12 @@ public class AdminControleur {
                 bindingResult.addError(new ObjectError("date_deces", ""));
                 model.addAttribute("deathDateInvalid", true);
                 model.addAttribute("deathDateInvalidMessage", "La date de décès doit être inférieure à la date du jour.");
-            } else if (!birthDate.isEmpty() && LocalDate.parse(deathDate).isBefore(LocalDate.parse(birthDate))) {
-                bindingResult.addError(new ObjectError("date_deces", ""));
-                model.addAttribute("deathDateInvalid", true);
-                model.addAttribute("deathDateInvalidMessage", "La date de décès doit être supérieure à la date de naissance.");
+            } else {
+                if (!birthDate.isEmpty() && LocalDate.parse(deathDate).isBefore(LocalDate.parse(birthDate))) {
+                    bindingResult.addError(new ObjectError("date_deces", ""));
+                    model.addAttribute("deathDateInvalid", true);
+                    model.addAttribute("deathDateInvalidMessage", "La date de décès doit être supérieure à la date de naissance.");
+                }
             }
         }
         if (bindingResult.hasErrors()) {
@@ -330,7 +182,7 @@ public class AdminControleur {
                 model.addAttribute("deathDateInvalidMessage", "La date de décès doit être inférieure à la date du jour.");
             } else {
                 //assert birthDate != null : "controller editing birthdate is null";
-                if (!(birthDate != null && birthDate.isEmpty()) && LocalDate.parse(deathDate).isBefore(LocalDate.parse(birthDate))) {
+                if (birthDate != null && birthDate.isEmpty() && LocalDate.parse(deathDate).isBefore(LocalDate.parse(birthDate))) {
                     bindingResult.addError(new ObjectError("date_deces", ""));
                     model.addAttribute("deathDateInvalid", true);
                     model.addAttribute("deathDateInvalidMessage", "La date de décès doit être supérieure à la date de naissance.");
@@ -360,5 +212,267 @@ public class AdminControleur {
     public String supprimer(@PathVariable(name = "id") long id) {
         individuServiceImplement.supprimerIndividu(id);
         return "redirect:/admin/individus";
+    }
+
+    /* *******************************************************SECTIONS******************************************************* */
+
+    @GetMapping(path = "{id}/sections")
+    public String individuSections(Model model, @PathVariable(name = "id") long id) {
+        Optional<Individu> optionalIndividu = individuServiceImplement.recupererUnIndividu(id);
+        if (optionalIndividu.isEmpty()) return "redirect:/admin/individus";
+        Individu individu = optionalIndividu.get();
+        model.addAttribute("individu", individu);
+        model.addAttribute("imageSize", individu.getImageUrl() == null ? 0 : individu.getImageUrl().length);
+        model.addAttribute("sections", sectionServiceImplement.recupererSectionsParIndividu(id));
+        return "sections";
+    }
+
+    @GetMapping(path = "{id}/ajouter-section")
+    public String ajouterSection(Model model, @PathVariable(name = "id") long id) {
+        Optional<Individu> optionalIndividu = individuServiceImplement.recupererUnIndividu(id);
+        if (optionalIndividu.isEmpty()) return "redirect:/admin/individus";
+        Individu individu = optionalIndividu.get();
+        model.addAttribute("individu", individu);
+        model.addAttribute("section", new Section());
+        return "newSection";
+    }
+
+    @PostMapping(path = "ajouter-section")
+    public String addingSection(@Valid @ModelAttribute("section") Section section, BindingResult bindingResult, long individuId, Model model) {
+        Optional<Individu> optionalIndividu = individuServiceImplement.recupererUnIndividu(individuId);
+        if (optionalIndividu.isEmpty()) return "redirect:/admin/individus";
+        Individu individu = optionalIndividu.get();
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("section", section);
+            model.addAttribute("individu", individu);
+            return "newSection";
+        }
+        sectionServiceImplement.ajouterSection(section, individuId);
+        return "redirect:/admin/"+individuId+"/sections";
+    }
+
+    @GetMapping(path = "{individuId}/editer-section/{sectionId}")
+    public String editerSection(Model model, @PathVariable(name = "individuId") long individuId, @PathVariable(name = "sectionId") long sectionId) {
+        Optional<Individu> optionalIndividu = individuServiceImplement.recupererUnIndividu(individuId);
+        if (optionalIndividu.isEmpty()) return "redirect:/admin/individus";
+        Optional<Section> optionalSection = sectionServiceImplement.recupererUneSection(sectionId);
+        if (optionalSection.isEmpty()) return "redirect:/admin/individus";
+        model.addAttribute("individu", optionalIndividu.get());
+        model.addAttribute("section", optionalSection.get());
+        return "editSection";
+    }
+
+    @PostMapping(path = "editer-section")
+    public String editingSection(@Valid @ModelAttribute("section") Section section, BindingResult bindingResult, long individuId, Model model) {
+        Optional<Individu> optionalIndividu = individuServiceImplement.recupererUnIndividu(individuId);
+        if (optionalIndividu.isEmpty()) return "redirect:/admin/individus";
+        Individu individu = optionalIndividu.get();
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("section", section);
+            model.addAttribute("individu", individu);
+            return "editSection";
+        }
+        sectionServiceImplement.modifierSection(section.getId(), section.getTitre(),section.getContenu(),section.getOrdreAffichage());
+        return "redirect:/admin/"+individuId+"/sections";
+    }
+
+    @GetMapping(path = "{individuId}/supprimer-section/{sectionId}")
+    public String deleteSection(@PathVariable(name = "sectionId") long sectionId, @PathVariable(name = "individuId") long individuId) {
+        sectionServiceImplement.supprimerSection(sectionId);
+        return "redirect:/admin/"+individuId+"/sections";
+    }
+
+    //***************************************************ENFANTS***************************************************
+
+    @GetMapping(path = "{id}/enfants")
+    public String enfants(Model model, @PathVariable(name = "id") long id) {
+        Optional<Individu> optionalIndividu = individuServiceImplement.recupererUnIndividu(id);
+        if (optionalIndividu.isEmpty()) return "redirect:/admin/individus";
+        Individu individu = optionalIndividu.get();
+        model.addAttribute("individu", individu);
+        model.addAttribute("enfants", individu.getEnfants());
+        return "enfants";
+    }
+
+    @GetMapping(path = "{individuId}/retirer-enfant/{enfantId}")
+    public String removeEnfant(Model model, @PathVariable(name = "individuId") long individuId, @PathVariable(name = "enfantId") long enfantId) {
+        Optional<Individu> optionalIndividu = individuServiceImplement.recupererUnIndividu(individuId);
+        if (optionalIndividu.isEmpty()) return "redirect:/admin/individus";
+        Individu individu = optionalIndividu.get();
+        Optional<Individu> optionalEnfant = individuServiceImplement.recupererUnIndividu(enfantId);
+        if (optionalEnfant.isEmpty()) return "redirect:/admin/individus";
+        Individu enfant = optionalEnfant.get();
+        individuServiceImplement.retirerEnfant(individu, enfant);
+        return "redirect:/admin/"+individuId+"/enfants";
+    }
+
+    @GetMapping(path = "{id}/ajouter-enfants-anterieurs")
+    public String ajouterEnfantsAnterieurs(Model model, @PathVariable(name = "id") long id) {
+        Optional<Individu> optionalIndividu = individuServiceImplement.recupererUnIndividu(id);
+        if (optionalIndividu.isEmpty()) return "redirect:/admin/individus";
+        Individu individu = optionalIndividu.get();
+
+        ArrayList<Individu> individus = (ArrayList<Individu>) individuServiceImplement.recupererSansParents();
+        individus.remove(individu);
+        if (individu.getKey_().startsWith("H")) {
+            Homme intermediaire = new Homme();
+            intermediaire.setId(id);
+            model.addAttribute("intermediaire", intermediaire);
+
+            model.addAttribute("individu", individu);
+            model.addAttribute("epouses", ((Homme) individu).getEpouses());
+            individus.removeAll(((Homme) individu).getEpouses());
+        } else {
+            Femme intermediaire = new Femme();
+            intermediaire.setId(id);
+            model.addAttribute("intermediaire", intermediaire);
+
+            model.addAttribute("individu", individu);
+            individus.remove(((Femme) individu).getEpoux());
+            if (((Femme) individu).getEpoux()!=null) individus.removeAll(((Femme) individu).getEpoux().getEpouses());
+            List<Homme> hommes = individuServiceImplement.recupererHommes();
+            if (((Femme) individu).getEpoux()!=null) {
+                hommes.remove(((Femme) individu).getEpoux());
+            }
+            for (Individu enfant :
+                    individu.getEnfants()) {
+                if (enfant.getKey_().startsWith("H")) {
+                    hommes.remove((Homme) enfant);
+                }
+            }
+            model.addAttribute("hommes", hommes);
+        }
+        individus.remove(individu);
+        for (int i = 0; i < individu.getEnfants().size(); i++) {
+            individus.remove(individu.getEnfants().get(i));
+        }
+        ArrayList<Individu> enfants = new ArrayList<>();
+        for (Individu ind :
+                individus) {
+            if (individu.getDate_naissance().isBefore(ind.getDate_naissance())) {
+                enfants.add(ind);
+            }
+        }
+
+        model.addAttribute("enfants", enfants);
+        return "ajouterEnfantHorsOuAnterieur";
+    }
+
+    @GetMapping(path = "{id}/ajouter-enfants")
+    public String ajouterEnfants(Model model, @PathVariable(name = "id") long id) {
+        Optional<Individu> optionalIndividu = individuServiceImplement.recupererUnIndividu(id);
+        if (optionalIndividu.isEmpty()) return "redirect:/admin/individus";
+        Individu individu = optionalIndividu.get();
+
+        ArrayList<Individu> individus = (ArrayList<Individu>) individuServiceImplement.recupererSansParents();
+        individus.remove(individu);
+        if (individu.getKey_().startsWith("H")) {
+            Homme intermediaire = new Homme();
+            intermediaire.setId(id);
+            model.addAttribute("intermediaire", intermediaire);
+
+            model.addAttribute("individu", individu);
+            model.addAttribute("epouses", ((Homme) individu).getEpouses());
+            individus.removeAll(((Homme) individu).getEpouses());
+        } else {
+            Femme intermediaire = new Femme();
+            intermediaire.setId(id);
+            model.addAttribute("intermediaire", intermediaire);
+
+            model.addAttribute("individu", individu);
+            individus.remove(((Femme) individu).getEpoux());
+            if (((Femme) individu).getEpoux()!=null) individus.removeAll(((Femme) individu).getEpoux().getEpouses());
+        }
+        individus.remove(individu);
+        for (int i = 0; i < individu.getEnfants().size(); i++) {
+            individus.remove(individu.getEnfants().get(i));
+        }
+        ArrayList<Individu> enfants = new ArrayList<>();
+        for (Individu ind :
+                individus) {
+            if (individu.getDate_naissance().isBefore(ind.getDate_naissance())) {
+                enfants.add(ind);
+            }
+        }
+
+        model.addAttribute("enfants", enfants);
+        return "ajouterEnfant";
+    }
+
+    @PostMapping("ajouter-enfants")
+    public String addingEnfants(@ModelAttribute("intermediaire") Individu intermediaire, Model model, Long individuId, Optional<Long> conjointId) {
+        Optional<Individu> optionalIndividu = individuServiceImplement.recupererUnIndividu(individuId);
+        if (optionalIndividu.isEmpty()) return "redirect:/admin/individus";
+        Individu individu = optionalIndividu.get();
+        Optional<Individu> optionalConjoint = individuServiceImplement.recupererUnIndividu(conjointId.orElse(0L));
+        if (optionalConjoint.isEmpty()) {
+            individuServiceImplement.affecterEnfants(individu, intermediaire.getEnfants());
+        }
+        else {
+            individuServiceImplement.affecterEnfants(individu, intermediaire.getEnfants(), optionalConjoint.get());
+        }
+        return "redirect:/admin/" + individuId + "/enfants";
+    }
+
+    //****************************************ÉPOUSES***********************************************************
+
+    @GetMapping(path = "{id}/epouses")
+    public String individuSpouses(Model model, @PathVariable(name = "id") long id) {
+        Optional<Homme> optionalHomme = individuServiceImplement.recupererUnHomme(id);
+        if (optionalHomme.isEmpty()) {
+            return "redirect:/admin/individus";
+        }
+        Homme epoux = optionalHomme.get();
+        model.addAttribute("individu", epoux);
+        model.addAttribute("imageSize", epoux.getImageUrl() == null ? 0 : epoux.getImageUrl().length);
+        model.addAttribute("epouses", epoux.getEpouses());
+        return "spouses";
+    }
+
+    @GetMapping(path = "{epouxId}/divorcer/{epouseId}")
+    public String divorce(Model model, @PathVariable(name = "epouxId") long epouxId, @PathVariable(name = "epouseId") long epouseId) {
+        Optional<Homme> optionalHomme = individuServiceImplement.recupererUnHomme(epouxId);
+        if (optionalHomme.isEmpty()) return "redirect:/admin/individus";
+        Homme epoux = optionalHomme.get();
+        Optional<Femme> optionalFemme = individuServiceImplement.recupererUneFemme(epouseId);
+        if (optionalFemme.isEmpty()) return "redirect:/admin/individus";
+        Femme epouse = optionalFemme.get();
+        individuServiceImplement.divorcer(epoux, epouse);
+
+        return "redirect:/admin/"+epouxId+"/epouses";
+    }
+
+    @GetMapping(path = "{id}/ajouter-epouse")
+    public String ajouterEpouses(Model model, @PathVariable(name = "id") long id) {
+        Optional<Homme> optionalHomme = individuServiceImplement.recupererUnHomme(id);
+        if (optionalHomme.isEmpty()) return "";
+        Homme individu = optionalHomme.get();
+        Homme intermediaire = new Homme();
+        intermediaire.setId(id);
+        model.addAttribute("individu", individu);
+        model.addAttribute("intermediaire", intermediaire);
+        ArrayList<Femme> individus = (ArrayList<Femme>) individuServiceImplement.recupererFemmes();
+        ArrayList<Femme> epouses = new ArrayList<>();
+        for (Femme femme : individus) {
+            if (femme.getEpoux()==null) {
+                epouses.add(femme);
+            }
+        }
+        for (Individu enfant : individu.getEnfants()) {
+            if (enfant.getKey_().startsWith("F"))
+                epouses.remove(((Femme) enfant));
+        }
+        epouses.removeAll(individu.getEpouses());
+        model.addAttribute("epouses", epouses);
+        return "mariage";
+    }
+
+    @PostMapping("ajouter-epouses")
+    public String addingEpouses(@ModelAttribute("intermediaire") Homme intermediaire, Model model, long individuId) {
+        Optional<Homme> optionalHomme = individuServiceImplement.recupererUnHomme(individuId);
+        if (optionalHomme.isEmpty()) return "redirect:/admin/individus";
+        Homme homme = optionalHomme.get();
+        individuServiceImplement.affecterEpouses(homme, intermediaire.getEpouses());
+        return "redirect:/admin/" + individuId + "/epouses";
     }
 }

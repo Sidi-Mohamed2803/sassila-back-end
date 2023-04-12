@@ -8,7 +8,7 @@
 
 <body>
     <div class="container">
-        <form class="form-signin" method="post" action="/login">
+        <form class="form-signin" method="post" th:action="@{/login}">
             <h2 class="form-signin-heading">Connectez-vous</h2>
             <div class="alert alert-success" role="alert">Vous êtes déconnectés</div>
             <p>
@@ -21,10 +21,11 @@
                 <input type="password" id="password" name="password" class="form-control" placeholder="Password"
                     required>
             </p>
-            <input name="_csrf" type="hidden" value="36b362a9-62f2-4117-82c0-6bb0f54aefc8" />
             <button class="btn btn-lg btn-primary btn-block" type="submit">Se connecter</button>
         </form>
     </div>
+
+    <div th:insert="fragments/footer :: Footer"></div>
 </body>
 
 </html>

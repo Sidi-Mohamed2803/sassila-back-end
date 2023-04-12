@@ -29,17 +29,6 @@ public class IndividuControleur {
     public List<Individu> getIndividus(){
         return individuServiceImplement.recupererIndividus();
     }
-//    public ResponseEntity<Response> getIndividus(){
-//        return ResponseEntity.ok(
-//                Response.builder()
-//                        .timeStamp(LocalDateTime.now())
-//                        .data(Map.of("Individus", individuServiceImplement.recupererIndividus()))
-//                        .message("Individus retrieved")
-//                        .status(OK)
-//                        .statusCode(OK.value())
-//                        .build()
-//        );
-//    }
 
     @GetMapping("/{id}")
     public Individu getOneIndividu(@PathVariable("id") long id) {
@@ -78,4 +67,17 @@ public class IndividuControleur {
     public List<Section> getIndividusSections(@PathVariable("id") long id){
         return sectionServiceImplement.recupererSectionsParIndividu(id);
     }
+
+//    public ResponseEntity<Response> getIndividus(){
+//        return ResponseEntity.ok(
+//                Response.builder()
+//                        .timeStamp(LocalDateTime.now())
+//                        .data(Map.of("Individus", individuServiceImplement.recupererIndividus()))
+//                        .message("Individus retrieved")
+//                        .status(OK)
+//                        .statusCode(OK.value())
+//                        .build()
+//        );
+//    }
+
 }

@@ -3,7 +3,7 @@
 
 <head>
     <div th:replace="fragments/head :: Head"></div>
-    <title>Tableau de bord</title>
+    <title>Sassila - Membres</title>
 </head>
 
 <body>
@@ -20,7 +20,29 @@
         <div id="page-content-wrapper">
             <div th:insert="fragments/nav :: Nav(page='Membres')"></div>
 
-            <div class="container-fluid px-4">
+
+
+            <div class="container-fluid px-4 vh-85" style="height: 85vh; overflow-y: scroll;">
+                <form action="/admin/individus" class="text-center">
+                    <div class="form-group row">
+                        <div class="col">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" name="prenom"
+                                       id="firstName" placeholder="Prénoms" />
+                                <label for="firstName">Prénoms</label>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-floating">
+                                <input type="text" class="form-control" name="nom"
+                                       id="surname" placeholder="Nom" />
+                                <label for="surname">Nom</label>
+                            </div>
+                        </div>
+                    </div>
+                    <br/>
+                    <input type="submit" class="col btn btn-primary" value="Chercher" />
+                </form>
                 <div class="row my-5">
                     <h3>Individus enregistrés</h3>
                     <div class="col">
@@ -82,27 +104,27 @@
                                 </tr>
                             </tbody>
                         </table>
-                        <div th:if="${individus.totalPages > 0}" style="display: grid; place-items: center;">
-                            <nav aria-label="Individus">
-                                <ul class="pagination">
-                                    <li class="page-item" th:classappend="${currentPage==1} ? disabled : enabled">
-                                        <a class="page-link"
-                                            th:href="@{/admin/individus(size=${individus.size}, page=${currentPage-1})}">Previous</a>
-                                    </li>
-                                    <li class="page-item" th:each="pageNumber : ${pageNumbers}">
-                                        <a class="page-link"
-                                            th:href="@{/admin/individus(size=${individus.size}, page=${pageNumber})}"
-                                            th:text=${pageNumber}
-                                            th:classappend="${pageNumber==individus.number + 1} ? disabled : enabled"></a>
-                                    </li>
-                                    <li class="page-item"
-                                        th:classappend="${currentPage==individus.totalPages} ? disabled : enabled">
-                                        <a class="page-link"
-                                            th:href="@{/admin/individus(size=${individus.size}, page=${currentPage+1})}">Next</a>
-                                    </li>
-                                </ul>
-                            </nav>
-                        </div>
+                    </div>
+                    <div th:if="${individus.totalPages > 0}" style="display: grid; place-items: center;">
+                        <nav aria-label="Individus">
+                            <ul class="pagination">
+                                <li class="page-item" th:classappend="${currentPage==1} ? disabled : enabled">
+                                    <a class="page-link"
+                                        th:href="@{/admin/individus(size=${individus.size}, page=${currentPage-1})}">Previous</a>
+                                </li>
+                                <li class="page-item" th:each="pageNumber : ${pageNumbers}">
+                                    <a class="page-link"
+                                        th:href="@{/admin/individus(size=${individus.size}, page=${pageNumber})}"
+                                        th:text=${pageNumber}
+                                        th:classappend="${pageNumber==individus.number + 1} ? disabled : enabled"></a>
+                                </li>
+                                <li class="page-item"
+                                    th:classappend="${currentPage==individus.totalPages} ? disabled : enabled">
+                                    <a class="page-link"
+                                        th:href="@{/admin/individus(size=${individus.size}, page=${currentPage+1})}">Next</a>
+                                </li>
+                            </ul>
+                        </nav>
                     </div>
                 </div>
             </div>

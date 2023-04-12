@@ -16,7 +16,11 @@ public interface IndividuService {
 
     Page<Individu> recupererIndividusPage(Pageable pageable);
 
-    List<Individu> recupererHommes();
+    Page<Individu> recupererIndividusPageParNomEtPrenom(Pageable pageable, String nom, String prenom);
+
+    List<Individu> recupererIndividusRecent();
+
+    List<Homme> recupererHommes();
 
     List<Femme> recupererFemmes();
 
@@ -26,7 +30,15 @@ public interface IndividuService {
 
     Optional<Femme> recupererUneFemme(long id);
 
-    void affecterEnfants(Femme femme, List<Individu> enfants);
+    List<Individu> recupererSansParents();
+
+    void affecterEnfants(Individu individu, List<Individu> enfants);
+
+    void affecterEnfants(Individu individu, List<Individu> enfants, Individu conjoint);
+
+    void retirerEnfant(Individu individu, Individu enfant);
+
+    void divorcer(Homme epoux, Femme epouse);
 
     void affecterEpouses(Homme homme, List<Femme> epouses);
 

@@ -20,13 +20,13 @@
         <div id="page-content-wrapper">
             <div th:insert="fragments/nav :: Nav(page='Nouvel individu')"></div>
 
-            <div class="container-fluid px-4">
+            <div class="container-fluid px-4 vh-85" style="height: 85vh; overflow-y: scroll;">
                 <div th:if="${ajoute==1}" class="alert alert-success d-flex align-items-center" role="alert">
                     <!-- <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Success:">
                         <use xlink:href="#check-circle-fill" />
                     </svg> -->
                     <div>
-                        Nouvel individu ajouté avec succès. 
+                        Nouvel individu ajouté avec succès.
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
@@ -78,8 +78,8 @@
                                     </div>
                                     <input type="date" class="form-control" name="birthDate" id="birthDate" />
                                 </div>
-                                <span th:if="${birthDateInvalid}" th:text="${birthDateInvalidMessage}"
-                                    class="text-danger"></span>
+                                <span th:if="${birthDateInvalid}" th:utext="${birthDateInvalidMessage}"
+                                    class="text-danger">test</span>
                             </div>
                         </div>
 

@@ -20,11 +20,11 @@
         <div id="page-content-wrapper">
             <div th:insert="fragments/nav :: Nav(page='Mariage')"></div>
 
-            <div class="container-fluid px-4">
+            <div class="container-fluid px-4 vh-85" style="height: 85vh; overflow-y: scroll;">
                 <div class="card mx-auto text-center" style="width: 70%;">
                     <div class="card-header">
                         <h2>
-                            Ajouter des épouses à <span th:text="${individu.prenom +' '+ individu.nom}"></span></h2>
+                            Ajouter des épouses à <a th:href="@{/admin/individu/{id}(id=${individu.id})}" th:text="${individu.prenom +' '+ individu.nom}"></a></h2>
                     </div>
                     <form th:action="@{/admin/ajouter-epouses}" method="post" th:object="${intermediaire}"
                         style="padding: 5%;">

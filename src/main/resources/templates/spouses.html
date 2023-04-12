@@ -20,13 +20,13 @@
         <div id="page-content-wrapper">
             <div th:insert="fragments/nav :: Nav(page='Épouses')"></div>
 
-            <div class="container-fluid px-4">
+            <div class="container-fluid px-4 vh-85" style="height: 85vh; overflow-y: scroll;">
                 <div style="display: flex; justify-content: center; align-items: center;">
                     <a th:href="@{/admin/{id}/ajouter-epouse(id=${individu.id})}" class="btn btn-primary"><i
                             class="fas fa-plus"></i> Ajouter épouse</a>
                 </div>
                 <div class="row my-5">
-                    <h3>Épouses de <span th:text="${individu.prenom+' '+individu.nom}"></span></h3>
+                    <h3>Épouses de <a th:href="@{/admin/individu/{id}(id=${individu.id})}" th:text="${individu.prenom+' '+individu.nom}"></a></h3>
                     <div class="col">
                         <table class="table bg-white rounded shadow-sm table-hover text-center">
                             <thead>
@@ -57,7 +57,7 @@
                                         &nbsp;
                                         <a href="#" data-bs-toggle="modal"
                                             th:attr="data-bs-target='#deleteModal'+${epouse.id}">
-                                            <i class="fas fa-light fa-trash-can"></i>
+                                            <i class="fas fa-solid fa-square-minus"></i>
                                         </a>
                                     </td>
                                     <div class="modal fade" tabindex="-1" th:attr="id='deleteModal'+${epouse.id}">
@@ -66,19 +66,20 @@
                                                 <div class="modal-header">
                                                     <h5 class="modal-title">Suppression</h5>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                        aria-label="Close"></button>
+                                                            aria-label="Close"></button>
                                                 </div>
                                                 <div class="modal-body">
-                                                    <p>Voulez-vous supprimer <span
-                                                            th:text="${epouse.prenom +' '+epouse.nom}"></span>
+                                                    <p>Voulez-vous divorcer <span
+                                                            th:text="${epouse.prenom +' '+epouse.nom}"></span> de <span
+                                                            th:text="${individu.prenom +' '+individu.nom}"></span>
                                                         ?
                                                     </p>
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-secondary"
-                                                        data-bs-dismiss="modal">Non</button>
-                                                    <a th:href="@{/admin/supprimer-individu/{id}(id=${epouse.id})}"
-                                                        class="btn btn-danger">Oui</a>
+                                                            data-bs-dismiss="modal">Non</button>
+                                                    <a th:href="@{/admin/{epouxId}/divorcer/{epouseId}(epouxId=${individu.id}, epouseId=${epouse.id})}"
+                                                       class="btn btn-danger">Oui</a>
                                                 </div>
                                             </div>
                                         </div>

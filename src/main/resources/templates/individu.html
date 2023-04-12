@@ -20,9 +20,9 @@
         <div id="page-content-wrapper">
             <div th:insert="fragments/nav :: Nav(page=${individu.prenom + ' ' + individu.nom})"></div>
 
-            <div class="container-fluid px-4">
-                <div class="card" style="margin-bottom: 5%;">
-                    <div style="margin: 0.5rem;">
+            <div class="container-fluid px-4 vh-85" style="height: 85vh; overflow-y: scroll;">
+                <div class="card overflow-auto">
+                    <div style="margin: 2%;">
                         <div class="row">
                             <div class="col-md-5">
                                 <div class="profile-links">
@@ -35,7 +35,7 @@
                                     <li th:if="${#strings.startsWith(individu.key_,'F') and individu.epoux != null}">
                                         <a th:href="@{/admin/individu/{id}(id=${individu.epoux.id})}">Époux</a>
                                     </li>
-                                    <li th:if="${#strings.startsWith(individu.key_,'F')}">
+                                    <li>
                                         <a th:href="@{/admin/{id}/enfants(id=${individu.id})}">Enfants</a>
                                     </li>
                                     <li>
@@ -115,6 +115,41 @@
                                             </div>
                                         </div>
                                     </div>
+                                </div>
+                                <br />
+                                <div>
+                                    <h2>Enfants</h2>
+                                    <ul th:if="${not #lists.isEmpty(individu.enfants)}" style="height: 10vh; overflow-y: scroll;">
+                                        <li th:each="enfant : ${individu.enfants}">
+                                            <a th:href="@{/admin/individu/{id}(id=${enfant.id})}" th:text="${enfant.prenom+' '+enfant.nom}"></a>
+                                        </li>
+                                    </ul>
+                                    <h4 th:unless="${not #lists.isEmpty(individu.enfants)}" style="text-align: center;">
+                                        <em>Pas d'enfants.</em>
+                                    </h4>
+                                </div>
+                                <br />
+                                <div th:if="${#strings.startsWith(individu.key_,'H')}">
+                                    <h2>Épouses</h2>
+                                    <ul th:if="${not #lists.isEmpty(individu.epouses)}" style="height: 10vh; overflow-y: scroll;">
+                                        <li th:each="epouse : ${individu.epouses}">
+                                            <a th:href="@{/admin/individu/{id}(id=${epouse.id})}" th:text="${epouse.prenom+' '+epouse.nom}"></a>
+                                        </li>
+                                    </ul>
+                                    <h4 th:unless="${not #lists.isEmpty(individu.epouses)}" style="text-align: center;">
+                                        <em>Célibataire.</em>
+                                    </h4>
+                                </div>
+                                <div th:if="${#strings.startsWith(individu.key_,'F')}">
+                                    <h2>Époux</h2>
+                                    <ul th:if="${individu.epoux!=null}">
+                                        <li>
+                                            <a th:href="@{/admin/individu/{id}(id=${individu.epoux.id})}" th:text="${individu.epoux.prenom+' '+individu.epoux.nom}"></a>
+                                        </li>
+                                    </ul>
+                                    <h4 th:unless="${individu.epoux!=null}" style="text-align: center;">
+                                        <em>Célibataire.</em>
+                                    </h4>
                                 </div>
                                 <br />
                                 <h2 class="mt-5">Biographie</h2>

@@ -14,11 +14,34 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                    <li class="nav-item-dropdown" onclick="window.location.href='/logout'">
-                        <a href="/logout" class="nav-link dropdown-toggle second-text fw-bold" id="navbarDropdown"
-                            role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <li class="nav-item-dropdown" onclick="window.location.href='#'">
+                        <a href="#" class="nav-link dropdown-toggle second-text fw-bold" id="navbarDropdown"
+                            role="button" data-bs-toggle="modal" data-bs-target="#logoutModal" aria-expanded="false">
                             <i class="fas fa-user me-2"></i>Sassila-Admin
                         </a>
+                        <!-- <a href="#" data-bs-toggle="modal" th:attr="data-bs-target='#logoutModal'">
+                            <i class="fas fa-light fa-trash-can"></i>
+                        </a> -->
+                        <div class="modal fade" tabindex="-1" th:attr="id='logoutModal'">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Déonnexion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Voulez-vous vous déconnecter ?
+                                        </p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Non</button>
+                                        <a href="/logout" class="btn btn-danger">Oui</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </li>
                 </ul>
             </div>
