@@ -228,7 +228,6 @@ public class IndividuServiceImplement implements IndividuService{
             customRepository.deleteMariageRelation(individu.getId());
             hommeRepository.deleteById(id);
         }
-
         return true;
     }
 
